@@ -1,16 +1,16 @@
-local function get_virtual_env(env_var)
-  local function basename(path)
-    local prefix = path
-    local i = path:find("[\\/:][^\\/:]*$")
-    if i then
-      prefix = path:sub(i + 1)
-    end
-      return prefix
-  end
+local pathfuncs = require('path')
+-- local pythonSymbol = "🐍"
+local pythonSymbol = "" -- Python logo from NerdFonts fonts
 
+local function get_virtual_env(env_var)
   env_path = clink.get_env(env_var)
   if env_path then
-    basen = basename(env_path)
+    basen = pathfuncs.basename(env_path)
+    if basen == ".venv" or basen == "_venv" or basen == "venv" then
+      -- If the virtual environment is named ".venv", also include the name of the parent directory
+      -- so that we can tell the different .venv directories apart
+      basen = pathfuncs.basename(pathfuncs.pathname(env_path)).."\\"..basen
+    end
     return basen
   end
     return nil
@@ -36,7 +36,7 @@ end
     local env_name = get_virtual_env('VIRTUAL_ENV')
     if env_name then
       segment.isNeeded = true
-      segment.text = "  "..env_name.." "
+      segment.text = " "..pythonSymbol.." "..env_name.." "
     else
       segment.isNeeded = false
     end
